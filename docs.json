@@ -21,7 +21,12 @@
           {
             "group": "Getting Started",
             "pages": [
-              "introduction",
+              "introduction"
+            ]
+          },
+          {
+            "group": "GenLayer",
+            "pages": [
               "snapshots/bradbury"
             ]
           }
