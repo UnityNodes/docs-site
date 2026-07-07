@@ -4,7 +4,7 @@ sidebarTitle: 'Bradbury snapshot'
 ---
 
 <Info>
-**Download:** [snapshots.unitynodes.com/bradbury/latest.tar.gz](https://snapshots.unitynodes.com/bradbury/latest.tar.gz) · Refreshed every 6 hours · v0.5.12
+**Download:** [snapshots.unitynodes.com/bradbury/latest.tar.gz](https://snapshots.unitynodes.com/bradbury/latest.tar.gz) · Refreshed every 6 hours
 </Info>
 
 Bootstrap a GenLayer Bradbury node in ~5 minutes instead of a multi-day full sync.
@@ -17,9 +17,15 @@ Bootstrap a GenLayer Bradbury node in ~5 minutes instead of a multi-day full syn
     systemctl stop genlayer-node
     ```
   </Step>
+  <Step title="Back up your existing chain DB">
+    ```bash
+    mv /opt/genlayer-node/data/node/genlayer.db \
+       /opt/genlayer-node/data/node/genlayer.db.bak-$(date +%Y%m%d-%H%M%S)
+    ```
+    <Warning>Do not skip this — if anything goes wrong you can restore your original DB from the `.bak-*` folder.</Warning>
+  </Step>
   <Step title="Replace the chain DB">
     ```bash
-    rm -rf /opt/genlayer-node/data/node/genlayer.db/
     curl -fL https://snapshots.unitynodes.com/bradbury/latest.tar.gz \
       | tar -xzf - -C /opt/genlayer-node/data/node/
     ```
@@ -30,6 +36,11 @@ Bootstrap a GenLayer Bradbury node in ~5 minutes instead of a multi-day full syn
     systemctl start genlayer-node
     ```
     You should see `Node is synced!!!` in `journalctl -u genlayer-node -f` within ~30 seconds.
+  </Step>
+  <Step title="Clean up the backup (once synced)">
+    ```bash
+    rm -rf /opt/genlayer-node/data/node/genlayer.db.bak-*
+    ```
   </Step>
 </Steps>
 
