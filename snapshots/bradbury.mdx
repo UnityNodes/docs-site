@@ -22,14 +22,14 @@ Bootstrap a GenLayer Bradbury node in ~5 minutes instead of a multi-day full syn
     mv /opt/genlayer-node/data/node/genlayer.db \
        /opt/genlayer-node/data/node/genlayer.db.bak-$(date +%Y%m%d-%H%M%S)
     ```
-    <Warning>Do not skip this — if anything goes wrong you can restore your original DB from the `.bak-*` folder.</Warning>
+    <Warning>Do not skip this - if anything goes wrong you can restore your original DB from the `.bak-*` folder.</Warning>
   </Step>
   <Step title="Replace the chain DB">
     ```bash
     curl -fL https://snapshots.unitynodes.com/bradbury/latest.tar.gz \
       | tar -xzf - -C /opt/genlayer-node/data/node/
     ```
-    <Note>Your `keystore/` and `.env` stay untouched — only chain state is replaced.</Note>
+    <Note>Your `keystore/` and `.env` stay untouched - only chain state is replaced.</Note>
   </Step>
   <Step title="Start your node">
     ```bash
@@ -54,4 +54,4 @@ sha256sum -c latest.tar.gz.sha256
 
 ## What's inside
 
-`genlayer.db/` (PebbleDB) only — no keys, no logs, no operator data. ~320 MB compressed / ~850 MB extracted.
+`genlayer.db/` (PebbleDB) only - no keys, no logs, no operator data. ~320 MB compressed / ~850 MB extracted.
