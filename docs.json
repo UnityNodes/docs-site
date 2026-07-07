@@ -20,12 +20,8 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["introduction"]
-          },
-          {
-            "group": "GenLayer",
             "pages": [
-              "snapshots/overview",
+              "introduction",
               "snapshots/bradbury"
             ]
           }
@@ -45,7 +41,7 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/UnityTeamNodes",
+      "x": "https://x.com/UnityNodes",
       "github": "https://github.com/UnityNodes"
     }
   }
