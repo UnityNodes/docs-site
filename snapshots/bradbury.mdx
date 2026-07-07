@@ -1,28 +1,15 @@
 ---
 title: 'Bradbury snapshot'
 sidebarTitle: 'Bradbury snapshot'
-description: 'Chain-state snapshots for the GenLayer Bradbury (phase 1) testnet'
 ---
 
 <Info>
-**Live download URL:** [https://snapshots.unitynodes.com/bradbury/latest.tar.gz](https://snapshots.unitynodes.com/bradbury/latest.tar.gz) · **Landing page:** [snapshots.unitynodes.com/bradbury/](https://snapshots.unitynodes.com/bradbury/)
+**Download:** [snapshots.unitynodes.com/bradbury/latest.tar.gz](https://snapshots.unitynodes.com/bradbury/latest.tar.gz) · Refreshed every 6 hours · v0.5.12
 </Info>
 
-## When to use this
+Bootstrap a GenLayer Bradbury node in ~5 minutes instead of a multi-day full sync.
 
-Restore from snapshot if your Bradbury node is:
-
-- **Stuck in `recover missing tx data: recovery depth limit reached`** after an RPC outage
-- **Hopelessly behind** and unable to catch up
-- **Fresh install** and you don't want to wait 4+ days for full sync from genesis
-
-## Prerequisites
-
-- GenLayer node **v0.5.12** installed (matches the snapshot's version)
-- Running as `systemd` service (typically `genlayer-node.service`)
-- Root or sudo access
-
-## Restore procedure
+## Restore
 
 <Steps>
   <Step title="Stop your node">
@@ -30,104 +17,30 @@ Restore from snapshot if your Bradbury node is:
     systemctl stop genlayer-node
     ```
   </Step>
-  <Step title="Back up your existing DB (optional but recommended)">
+  <Step title="Replace the chain DB">
     ```bash
-    mv /opt/genlayer-node/data/node/genlayer.db{,.bak-$(date +%s)}
+    rm -rf /opt/genlayer-node/data/node/genlayer.db/
+    curl -fL https://snapshots.unitynodes.com/bradbury/latest.tar.gz \
+      | tar -xzf - -C /opt/genlayer-node/data/node/
     ```
-    <Note>Your `keystore/` and `.env` stay put — the snapshot only replaces chain state.</Note>
-  </Step>
-  <Step title="Download the snapshot and its checksum">
-    ```bash
-    cd /tmp
-    curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz
-    curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256
-    ```
-  </Step>
-  <Step title="Verify integrity">
-    ```bash
-    sha256sum -c latest.tar.gz.sha256
-    # → latest.tar.gz: OK
-    ```
-    <Warning>Do not skip this step. A corrupt download will produce a broken database.</Warning>
-  </Step>
-  <Step title="Extract into your data directory">
-    ```bash
-    tar -xzf latest.tar.gz -C /opt/genlayer-node/data/node/
-    ```
-    This creates `/opt/genlayer-node/data/node/genlayer.db/` with ~156 SST files.
+    <Note>Your `keystore/` and `.env` stay untouched — only chain state is replaced.</Note>
   </Step>
   <Step title="Start your node">
     ```bash
     systemctl start genlayer-node
-    journalctl -u genlayer-node -f
     ```
-    Within 10–30 seconds you should see `Node is synced!!!` in the logs.
+    You should see `Node is synced!!!` in `journalctl -u genlayer-node -f` within ~30 seconds.
   </Step>
 </Steps>
 
-## What's in the snapshot
-
-| | |
-|---|---|
-| Contents | `genlayer.db/` (PebbleDB LSM-tree) |
-| Compressed size | ~320 MB |
-| Extracted size | ~850 MB |
-| File count | ~170 (156 × `.sst` + metadata) |
-| Node version | v0.5.12 |
-| Protocol | `v0.5:cdc4ba82` |
-| Consensus contract | `0x8aCE036C8C3C5D603dB546b031302FCf149648E8` |
-| Genesis block | `501711` |
-
-## Metadata files
-
-Every snapshot ships with a `.txt` file listing the exact block it captures and creation time:
+## Verify integrity (optional)
 
 ```bash
-curl -s https://snapshots.unitynodes.com/bradbury/latest.txt
+curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz
+curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256
+sha256sum -c latest.tar.gz.sha256
 ```
 
-Example output:
-```
-blockNumber=13899744
-created_at_utc=2026-07-07T22:00:47Z
-node_version=v0.5.12
-protocol=v0.5:cdc4ba82
-chain=bradbury-phase1
-size_bytes=338184506
-```
+## What's inside
 
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="Node fails to start after restore with SST-file errors">
-    Confirm the snapshot extracted into the right path. It should produce `<datadir>/genlayer.db/*.sst`, not `<datadir>/*.sst`. Re-extract explicitly:
-    ```bash
-    tar -tzf latest.tar.gz | head -3
-    # → genlayer.db/
-    #   genlayer.db/CURRENT
-    #   genlayer.db/MANIFEST-XXXXXX
-    ```
-  </Accordion>
-  <Accordion title="Sync stays stuck at `hopelessly_behind` after restore">
-    Snapshots are refreshed every 6 hours. If yours is much older than that, the node still has to replay a small window — usually a few thousand blocks — before it catches up. Give it 2–5 minutes.
-  </Accordion>
-  <Accordion title="Restore fails with `keystore not found` or similar">
-    Snapshot restores **only** chain state. Your own `keystore/`, `.env`, and `configs/node/config.yaml` must already exist. If you deleted them, re-create per the [official setup guide](https://docs.genlayer.com/validators/setup-guide).
-  </Accordion>
-  <Accordion title="Version mismatch between snapshot and my node">
-    Snapshots are tied to a specific `genlayer-node` version (currently v0.5.12). Extracting a v0.5.12 snapshot into a v0.5.11 (or vice-versa) node will fail. Match versions first.
-  </Accordion>
-</AccordionGroup>
-
-## Automation
-
-If you want to hook this into your own recovery script, all URLs are stable:
-
-```bash
-#!/bin/bash
-SNAP=https://snapshots.unitynodes.com/bradbury
-systemctl stop genlayer-node
-rm -rf /opt/genlayer-node/data/node/genlayer.db/
-curl -fL $SNAP/latest.tar.gz | tar -xzf - -C /opt/genlayer-node/data/node/
-systemctl start genlayer-node
-```
+`genlayer.db/` (PebbleDB) only — no keys, no logs, no operator data. ~320 MB compressed / ~850 MB extracted.
