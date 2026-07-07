@@ -7,7 +7,7 @@
     "light": "#4D8BFF",
     "dark": "#0645C7"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg",
@@ -31,7 +31,10 @@
   },
   "navbar": {
     "links": [
-      { "label": "Website", "href": "https://unitynodes.com" }
+      {
+        "label": "Website",
+        "href": "https://unitynodes.com"
+      }
     ],
     "primary": {
       "type": "button",
