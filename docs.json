@@ -1,0 +1,52 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Unity Nodes",
+  "colors": {
+    "primary": "#0A5CFF",
+    "light": "#4D8BFF",
+    "dark": "#0645C7"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://unitynodes.com"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["introduction"]
+          },
+          {
+            "group": "GenLayer",
+            "pages": [
+              "snapshots/overview",
+              "snapshots/bradbury"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      { "label": "Website", "href": "https://unitynodes.com" }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Snapshots",
+      "href": "https://snapshots.unitynodes.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/UnityTeamNodes",
+      "github": "https://github.com/UnityNodes"
+    }
+  }
+}
