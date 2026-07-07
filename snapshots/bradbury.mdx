@@ -46,7 +46,7 @@ Full archive listing (all retained snapshots): [snapshots.unitynodes.com/bradbur
     ```bash
     systemctl start genlayer-node
     ```
-    You should see `Node is synced!!!` in `journalctl -u genlayer-node -f` within ~30 seconds.
+    You should see `Node is synced!!!` in `journalctl -u genlayer-node -f` within a few minutes.
   </Step>
   <Step title="Clean up the backup (once synced)">
     ```bash
@@ -55,10 +55,50 @@ Full archive listing (all retained snapshots): [snapshots.unitynodes.com/bradbur
   </Step>
 </Steps>
 
-## Verify integrity (optional)
+## FAQ
 
-```bash
-curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz
-curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256
-sha256sum -c latest.tar.gz.sha256
-```
+<AccordionGroup>
+
+<Accordion title="How long does the node take to sync after restore?">
+  On a node that has been running before, expect **1-5 minutes** for the process to complete and `Node is synced!!!` to appear in the logs.
+
+  On the **very first run** after a fresh installation, GenVM's WASM runtime is precompiled and cached on disk - this one-time step adds **5-10 minutes** to the first sync. Every subsequent restore reuses the cache and is fast.
+</Accordion>
+
+<Accordion title="How do I roll back to my previous DB from the .bak folder?">
+  If the new snapshot causes any problem, stop the service and swap the backup back in place:
+
+  ```bash
+  systemctl stop genlayer-node
+  rm -rf /opt/genlayer-node/data/node/genlayer.db
+  mv /opt/genlayer-node/data/node/genlayer.db.bak-* \
+     /opt/genlayer-node/data/node/genlayer.db
+  systemctl start genlayer-node
+  ```
+
+  Your node will resume from the exact state it was in before the restore.
+</Accordion>
+
+<Accordion title="How do I verify the file's integrity (SHA256)?">
+  Every archive is published with a matching `.sha256` file. Download both and check:
+
+  ```bash
+  curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz
+  curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256
+  sha256sum -c latest.tar.gz.sha256
+  ```
+
+  Expected output: `latest.tar.gz: OK`. If it prints anything else, delete the file and download again.
+</Accordion>
+
+<Accordion title="How often are snapshots refreshed?">
+  A new snapshot is created **every 6 hours** at 00:00, 06:00, 12:00, and 18:00 UTC. Only the **last 4 versions** are kept; older ones are removed automatically. The `latest.tar.gz` link always points to the newest one.
+</Accordion>
+
+<Accordion title="What's inside the snapshot? Does restoring touch any of my other files?">
+  The archive contains **only** the `genlayer.db/` directory (public chain state, PebbleDB LSM files). It does **not** contain any keys, wallets, `.env`, logs, hostnames, IPs, or operator identity.
+
+  The restore procedure replaces only the `genlayer.db/` folder inside your data directory. Everything else on your node - `keystore/`, `operator-keystore.json`, `.env`, `configs/`, `logs/`, systemd unit, running processes - is left completely untouched.
+</Accordion>
+
+</AccordionGroup>
