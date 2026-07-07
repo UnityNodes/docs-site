@@ -9,6 +9,30 @@ sidebarTitle: 'Bradbury snapshot'
 
 Bootstrap a GenLayer Bradbury node in ~5 minutes instead of a multi-day full sync.
 
+## What's inside
+
+`genlayer.db/` (PebbleDB) only - no keys, no logs, no operator data. ~320 MB compressed / ~850 MB extracted.
+
+## Live snapshot info
+
+Current block and timestamp are published in a plain-text file next to the archive:
+
+```bash
+curl https://snapshots.unitynodes.com/bradbury/latest.txt
+```
+
+Example output:
+```
+blockNumber=13899744
+created_at_utc=2026-07-07T22:00:47Z
+node_version=v0.5.12
+protocol=v0.5:cdc4ba82
+chain=bradbury-phase1
+size_bytes=338184506
+```
+
+Full listing of all retained snapshots (with sizes, block heights, dates): [snapshots.unitynodes.com/bradbury/](https://snapshots.unitynodes.com/bradbury/)
+
 ## Restore
 
 <Steps>
@@ -51,7 +75,3 @@ curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz
 curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256
 sha256sum -c latest.tar.gz.sha256
 ```
-
-## What's inside
-
-`genlayer.db/` (PebbleDB) only - no keys, no logs, no operator data. ~320 MB compressed / ~850 MB extracted.
