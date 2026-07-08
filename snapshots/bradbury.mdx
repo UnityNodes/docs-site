@@ -65,6 +65,28 @@ Full archive listing (all retained snapshots): [snapshots.unitynodes.com/bradbur
   On the **very first run** after a fresh installation, GenVM's WASM runtime is precompiled and cached on disk - this one-time step adds **5-10 minutes** to the first sync. Every subsequent restore reuses the cache and is fast.
 </Accordion>
 
+<Accordion title="How do I check the node's sync status?">
+  Watch the service logs live:
+
+  ```bash
+  journalctl -u genlayer-node -f
+  ```
+
+  Look for a line that reads `INF Node is synced!!!` - that means you have caught up.
+
+  You can also grab just the most recent processed block or the last "synced" event:
+
+  ```bash
+  journalctl -u genlayer-node -n 500 --no-pager \
+    | grep -oE 'blockNumber=[0-9]+' | tail -1
+
+  journalctl -u genlayer-node --no-pager \
+    | grep "Node is synced" | tail -1
+  ```
+
+  Compare the block number with the **Network head** shown in the widget at the top of this page - if they are close, you are in sync.
+</Accordion>
+
 <Accordion title="How do I roll back to my previous DB from the .bak folder?">
   If the new snapshot causes any problem, stop the service and swap the backup back in place:
 
