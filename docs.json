@@ -9,8 +9,8 @@
   },
   "favicon": "/favicon.png",
   "logo": {
-    "light": "/logo/mark.png",
-    "dark": "/logo/mark.png",
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
     "href": "https://unitynodes.com"
   },
   "navigation": {
