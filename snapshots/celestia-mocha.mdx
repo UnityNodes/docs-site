@@ -17,7 +17,7 @@ Bootstrap a Celestia `mocha-4` testnet node in ~5 minutes instead of a multi-hou
 - `data/` folder from a live `celestia-appd v9.0.4-mocha` node running on **PebbleDB** with aggressive pruning (`custom` / `keep-recent=100` / `interval=19`, `indexer=null`).
 - `snapshots/` sub-dir included so your node can immediately serve state-sync to peers.
 
-**Download:** [snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4](https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4) — refreshed every 4 hours.
+**Download:** [snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4](https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4) - refreshed every 4 hours.
 
 Full archive listing: [snapshots.unitynodes.com/celestia-mocha/](https://snapshots.unitynodes.com/celestia-mocha/)
 
@@ -38,8 +38,6 @@ mv $HOME/.celestia-app/priv_validator_state.json.backup $HOME/.celestia-app/data
 sudo systemctl restart celestia-appd && sudo journalctl -u celestia-appd -fo cat
 ```
 
-<Note>Your `~/.celestia-app/config/` (including `priv_validator_key.json` and `node_key.json`) stays untouched — only chain state is replaced.</Note>
-
 ## Verify (optional)
 
 ```bash
@@ -55,19 +53,12 @@ sha256sum -c snapshot.tar.lz4.sha256
     Every **4 hours**. The last 2 snapshots are kept online.
   </Accordion>
   <Accordion title="What db backend?">
-    `pebbledb` — Celestia's default since v9.
+    `pebbledb` - Celestia's default since v9.
   </Accordion>
   <Accordion title="Can I use this to bootstrap a validator?">
-    Yes. The snapshot contains only chain state — no keys. Your existing `config/priv_validator_key.json` and `data/priv_validator_state.json` stay yours.
+    Yes. The snapshot contains only chain state - no keys. Your existing `config/priv_validator_key.json` and `data/priv_validator_state.json` stay yours.
   </Accordion>
   <Accordion title="Does the snapshot include state-sync chunks?">
     Yes. After restore, your node can also serve `state-sync` to downstream peers (snapshot-interval=2000).
-  </Accordion>
-  <Accordion title="Chain / network / version details">
-    - Chain ID: `mocha-4`
-    - App version: `v9.0.4-mocha`
-    - DB backend: `pebbledb`
-    - Pruning: `custom` / `keep-recent=100` / `interval=19`
-    - Indexer: `null`
   </Accordion>
 </AccordionGroup>
