@@ -16,7 +16,6 @@ Bootstrap a Celestia `mocha-4` testnet node in ~5 minutes instead of a multi-hou
 
 - `data/` folder from a live `celestia-appd v9.0.4-mocha` node running on **PebbleDB** with aggressive pruning (`custom` / `keep-recent=100` / `interval=19`, `indexer=null`).
 - `snapshots/` sub-dir included so your node can immediately serve state-sync to peers.
-- **Excluded:** `priv_validator_state.json` (you must keep your own to prevent any risk of double-signing).
 
 **Download:** [snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4](https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4) — refreshed every 4 hours.
 
@@ -26,48 +25,22 @@ Also available: [`genesis.json`](https://snapshots.unitynodes.com/celestia-mocha
 
 ## Restore
 
-<Steps>
-  <Step title="Stop your node">
-    ```bash
-    sudo systemctl stop celestia-appd
-    ```
-  </Step>
-  <Step title="Back up your priv_validator_state.json">
-    ```bash
-    cp ~/.celestia-app/data/priv_validator_state.json /tmp/pvs.json.bak
-    ```
-    <Warning>Never overwrite this file with someone else's — you risk double-signing and getting jailed/tombstoned. Always keep your own copy.</Warning>
-  </Step>
-  <Step title="Reset chain data (keeps config & keys)">
-    ```bash
-    celestia-appd tendermint unsafe-reset-all --home ~/.celestia-app --keep-addr-book
-    ```
-    <Note>This only wipes `data/`. Your `config/priv_validator_key.json` and `config/node_key.json` stay untouched.</Note>
-  </Step>
-  <Step title="Download and extract the snapshot">
-    ```bash
-    curl -fL https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4 \
-      | lz4 -dc \
-      | tar -xf - -C ~/.celestia-app
-    ```
-  </Step>
-  <Step title="Restore your priv_validator_state.json">
-    ```bash
-    mv /tmp/pvs.json.bak ~/.celestia-app/data/priv_validator_state.json
-    ```
-  </Step>
-  <Step title="Start the node">
-    ```bash
-    sudo systemctl start celestia-appd
-    sudo journalctl -u celestia-appd -fo cat
-    ```
-    Within a few minutes you should see the node catching up the last blocks, then reaching the head.
-  </Step>
-</Steps>
+```bash
+sudo systemctl stop celestia-appd
 
-## Verify
+cp $HOME/.celestia-app/data/priv_validator_state.json $HOME/.celestia-app/priv_validator_state.json.backup
 
-Optional but recommended:
+rm -rf $HOME/.celestia-app/data
+curl -L https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app
+
+mv $HOME/.celestia-app/priv_validator_state.json.backup $HOME/.celestia-app/data/priv_validator_state.json
+
+sudo systemctl restart celestia-appd && sudo journalctl -u celestia-appd -fo cat
+```
+
+<Note>Your `~/.celestia-app/config/` (including `priv_validator_key.json` and `node_key.json`) stays untouched — only chain state is replaced.</Note>
+
+## Verify (optional)
 
 ```bash
 curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4
@@ -85,7 +58,7 @@ sha256sum -c snapshot.tar.lz4.sha256
     `pebbledb` — Celestia's default since v9.
   </Accordion>
   <Accordion title="Can I use this to bootstrap a validator?">
-    Yes. Just be sure to **keep your own** `priv_validator_state.json` and `config/priv_validator_key.json` — this snapshot contains no keys.
+    Yes. The snapshot contains only chain state — no keys. Your existing `config/priv_validator_key.json` and `data/priv_validator_state.json` stay yours.
   </Accordion>
   <Accordion title="Does the snapshot include state-sync chunks?">
     Yes. After restore, your node can also serve `state-sync` to downstream peers (snapshot-interval=2000).
