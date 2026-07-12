@@ -29,6 +29,12 @@
             "pages": [
               "snapshots/bradbury"
             ]
+          },
+          {
+            "group": "Celestia",
+            "pages": [
+              "snapshots/celestia-mocha"
+            ]
           }
         ]
       }
