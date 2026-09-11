@@ -1,0 +1,81 @@
+---
+title: 'Celestia Mainnet snapshot'
+sidebarTitle: 'Celestia Mainnet'
+---
+
+Bootstrap a Celestia `celestia` mainnet node in minutes instead of a multi-day full sync.
+
+<iframe
+  src="https://snapshots.unitynodes.com/celestia-mainnet/widget.html"
+  width="100%"
+  height="110"
+  style={{ border: 'none', background: 'transparent', display: 'block' }}
+/>
+
+## What's inside
+
+- `data/` folder from a live `celestia-appd v9.0.6` mainnet node running on **PebbleDB** with aggressive pruning (`custom` / `keep-recent=100` / `interval=19`, `min-retain-blocks=3000`, `indexer=null`).
+- `snapshots/` sub-dir included so your node can immediately serve state-sync to peers.
+
+**Download:** [snapshots.unitynodes.com/celestia-mainnet/latest.tar.lz4](https://snapshots.unitynodes.com/celestia-mainnet/latest.tar.lz4) - refreshed every 4 hours.
+
+Full archive listing: [snapshots.unitynodes.com/celestia-mainnet/](https://snapshots.unitynodes.com/celestia-mainnet/)
+
+Also available: [`genesis.json`](https://snapshots.unitynodes.com/celestia-mainnet/genesis.json) · [`addrbook.json`](https://snapshots.unitynodes.com/celestia-mainnet/addrbook.json)
+
+<Warning>
+  This is a **pruned** snapshot. It is meant for validators, full nodes and RPC endpoints that
+  only need recent state. It cannot serve historical queries - for that you need an archive node.
+</Warning>
+
+## Restore
+
+```bash
+sudo systemctl stop celestia-appd
+
+cp $HOME/.celestia-app/data/priv_validator_state.json $HOME/.celestia-app/priv_validator_state.json.backup
+
+rm -rf $HOME/.celestia-app/data
+curl -L https://snapshots.unitynodes.com/celestia-mainnet/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app
+
+mv $HOME/.celestia-app/priv_validator_state.json.backup $HOME/.celestia-app/data/priv_validator_state.json
+
+sudo systemctl restart celestia-appd && sudo journalctl -u celestia-appd -fo cat
+```
+
+<Warning>
+  Do not skip the `priv_validator_state.json` backup step. That file records the last height and
+  round your validator signed. Restoring somebody else's signing state - or an older copy of your
+  own - is the classic way to double-sign and get slashed.
+</Warning>
+
+## Verify (optional)
+
+```bash
+curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/celestia-mainnet/latest.tar.lz4
+curl -fL -o snapshot.tar.lz4.sha256 https://snapshots.unitynodes.com/celestia-mainnet/latest.tar.lz4.sha256
+sha256sum -c snapshot.tar.lz4.sha256
+```
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How often is the snapshot updated?">
+    Every **4 hours**. The last 2 snapshots are kept online.
+  </Accordion>
+  <Accordion title="What db backend?">
+    `pebbledb` - Celestia's default since v9.
+  </Accordion>
+  <Accordion title="Can I use this to bootstrap a validator?">
+    Yes. The tarball contains only `data/`. There is no `config/` directory in it, so no
+    `priv_validator_key.json`, no `node_key.json` and no keyring - your identity files are never
+    overwritten by a restore. `data/priv_validator_state.json` is deliberately excluded too.
+  </Accordion>
+  <Accordion title="Does the snapshot include state-sync chunks?">
+    Yes. After restore, your node can also serve `state-sync` to downstream peers (`snapshot-interval=1500`, `snapshot-keep-recent=2`).
+  </Accordion>
+  <Accordion title="Is the node stopped while the snapshot is taken?">
+    Yes, briefly. The archive is a cold tar taken with `celestia-appd` stopped, so the database is
+    never copied mid-write. Downtime is around 10-15 seconds per cycle.
+  </Accordion>
+</AccordionGroup>

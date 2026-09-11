@@ -33,6 +33,7 @@
           {
             "group": "Celestia",
             "pages": [
+              "snapshots/celestia-mainnet",
               "snapshots/celestia-mocha"
             ]
           }
