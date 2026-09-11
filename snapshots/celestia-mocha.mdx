@@ -1,9 +1,9 @@
 ---
-title: 'Celestia Mocha-4 snapshot'
-sidebarTitle: 'Celestia Mocha-4'
+title: 'Celestia Mocha-5 snapshot'
+sidebarTitle: 'Celestia Mocha-5'
 ---
 
-Bootstrap a Celestia `mocha-4` testnet node in ~5 minutes instead of a multi-hour full sync.
+Bootstrap a Celestia `mocha-5` testnet node in ~5 minutes instead of a multi-hour full sync.
 
 <iframe
   src="https://snapshots.unitynodes.com/celestia-mocha/widget.html"
@@ -14,7 +14,7 @@ Bootstrap a Celestia `mocha-4` testnet node in ~5 minutes instead of a multi-hou
 
 ## What's inside
 
-- `data/` folder from a live `celestia-appd v9.0.4-mocha` node running on **PebbleDB** with aggressive pruning (`custom` / `keep-recent=100` / `interval=19`, `indexer=null`).
+- `data/` folder from a live `celestia-appd v9.0.6-mocha` node running on **PebbleDB** with aggressive pruning (`custom` / `keep-recent=100` / `interval=19`, `indexer=null`).
 - `snapshots/` sub-dir included so your node can immediately serve state-sync to peers.
 
 **Download:** [snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4](https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4) - refreshed every 4 hours.
@@ -59,6 +59,6 @@ sha256sum -c snapshot.tar.lz4.sha256
     Yes. The snapshot contains only chain state - no keys. Your existing `config/priv_validator_key.json` and `data/priv_validator_state.json` stay yours.
   </Accordion>
   <Accordion title="Does the snapshot include state-sync chunks?">
-    Yes. After restore, your node can also serve `state-sync` to downstream peers (snapshot-interval=2000).
+    Yes. After restore, your node can also serve `state-sync` to downstream peers (snapshot-interval=1500).
   </Accordion>
 </AccordionGroup>
