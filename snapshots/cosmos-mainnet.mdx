@@ -27,7 +27,17 @@ Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapsho
 
 ## Restore
 
-```bash
+Pick the variant you need - each tab has its own copy button.
+
+| Variant | Taken at | Use it when |
+|---|---|---|
+| **Latest** | every 4 hours | normal bootstrap of a node |
+| **Pre-upgrade** | `H-1`, the last block before a scheduled upgrade height | you want to cross the upgrade yourself, on the old binary, exactly as the network does |
+| **Post-upgrade** | shortly after the upgrade height, on the new binary | you are joining after an upgrade and want migrated state with no upgrade handling at all |
+
+<CodeGroup>
+
+```bash Latest
 sudo systemctl stop gaiad
 
 cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
@@ -39,6 +49,42 @@ mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_
 
 sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
 ```
+
+```bash Pre-upgrade (H-1)
+sudo systemctl stop gaiad
+
+cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
+
+rm -rf $HOME/.gaia/data
+curl -L https://snapshots.unitynodes.com/cosmos-mainnet/pre-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+
+mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
+
+# start on the OLD binary - the chain will halt at the upgrade height, then swap and restart
+sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
+```
+
+```bash Post-upgrade
+sudo systemctl stop gaiad
+
+cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
+
+rm -rf $HOME/.gaia/data
+curl -L https://snapshots.unitynodes.com/cosmos-mainnet/post-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+
+mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
+
+# start on the NEW binary for that upgrade
+sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
+```
+
+</CodeGroup>
+
+<Note>
+  `pre-upgrade` and `post-upgrade` exist only around a scheduled Cosmos Hub upgrade. The
+  [archive listing](https://snapshots.unitynodes.com/cosmos-mainnet/) shows which variants are
+  currently published, and each one ships a `.txt` sidecar naming the upgrade it belongs to.
+</Note>
 
 <Warning>
   Do not skip the `priv_validator_state.json` backup step. That file records the last height and
