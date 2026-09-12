@@ -15,6 +15,11 @@ Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-
 ## What's inside
 
 - `data/` folder from a live Cosmos Hub (`cosmoshub-4`) `gaiad` full node running on **GoLevelDB** with pruning (`custom` / `keep-recent=100` / `interval=19`).
+- `wasm/state` - the CosmWasm **contract bytecode**. `x/wasm` keeps only the code hashes in
+  `application.db` and the bytecode itself on disk, so a `data/`-only archive restores a node
+  that cannot execute contracts. It is bundled here so the snapshot is self-sufficient.
+  `wasm/cache` is deliberately left out: it is a compiled, machine-specific cache your node
+  rebuilds by itself.
 
 **Download:** [snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4](https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4) - refreshed every 4 hours.
 
@@ -34,6 +39,7 @@ Pick the variant you need - each tab has its own copy button.
 | **Latest** | every 4 hours | normal bootstrap of a node |
 | **Pre-upgrade** | `H-1`, the last block before a scheduled upgrade height | you want to cross the upgrade yourself, on the old binary, exactly as the network does |
 | **Post-upgrade** | shortly after the upgrade height, on the new binary | you are joining after an upgrade and want migrated state with no upgrade handling at all |
+| **Wasm only** | same cadence as Latest | your node is already synced and you only need the CosmWasm contract bytecode |
 
 <CodeGroup>
 
@@ -78,6 +84,15 @@ mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_
 sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
 ```
 
+```bash Wasm only
+# contract bytecode only - for a node that is already synced
+sudo systemctl stop gaiad
+
+curl -L https://snapshots.unitynodes.com/cosmos-mainnet/wasm.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+
+sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
+```
+
 </CodeGroup>
 
 <Note>
@@ -110,9 +125,14 @@ sha256sum -c snapshot.tar.lz4.sha256
     `goleveldb`.
   </Accordion>
   <Accordion title="Can I use this to bootstrap a validator?">
-    Yes. The tarball contains only `data/`. There is no `config/` directory in it, so no
-    `priv_validator_key.json`, no `node_key.json` and no keyring - your identity files are never
-    overwritten by a restore.
+    Yes. The tarball carries only `data/` and `wasm/state`. There is no `config/` directory in
+    it, so no `priv_validator_key.json`, no `node_key.json` and no keyring - your identity files
+    are never overwritten by a restore.
+  </Accordion>
+  <Accordion title="Do I need to download the wasm archive separately?">
+    No. `wasm/state` is already inside the snapshots above, so a single download gives you a
+    node that can execute contracts. The standalone `wasm.tar.lz4` exists only for topping up a
+    node that is already synced.
   </Accordion>
   <Accordion title="How is the snapshot kept small?">
     The producing node is pruned (`custom` / `keep-recent=100` / `interval=19`), so it retains
