@@ -36,6 +36,13 @@
               "snapshots/celestia-mainnet",
               "snapshots/celestia-mocha"
             ]
+          },
+          {
+            "group": "Cosmos",
+            "pages": [
+              "snapshots/cosmos-mainnet",
+              "snapshots/cosmos-testnet"
+            ]
           }
         ]
       }

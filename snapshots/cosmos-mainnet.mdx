@@ -1,0 +1,79 @@
+---
+title: 'Cosmos Hub Mainnet snapshot'
+sidebarTitle: 'Cosmos Mainnet'
+---
+
+Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-day full sync.
+
+## What's inside
+
+- `data/` folder from a live Cosmos Hub (`cosmoshub-4`) `gaiad` full node running on **GoLevelDB** with pruning (`custom` / `keep-recent=100` / `interval=19`).
+- The producing node runs with **voting power 0** (it is a dedicated snapshot node, not a validator).
+- `data/priv_validator_state.json` is intentionally **excluded** from the archive.
+
+**Download:** [snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4](https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4) - refreshed every 4 hours.
+
+Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapshots.unitynodes.com/cosmos-mainnet/)
+
+<Warning>
+  This is a **pruned** snapshot. It is meant for validators, full nodes and RPC endpoints that
+  only need recent state. It cannot serve historical queries - for that you need an archive node.
+</Warning>
+
+<Note>
+  GoLevelDB today. A PebbleDB snapshot track is planned and will be published as a separate file
+  once available - do not restore a GoLevelDB snapshot onto a node configured for PebbleDB.
+</Note>
+
+## Restore
+
+```bash
+sudo systemctl stop gaiad
+
+cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
+
+rm -rf $HOME/.gaia/data
+curl -L https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+
+mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
+
+sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
+```
+
+<Warning>
+  Do not skip the `priv_validator_state.json` backup step. That file records the last height and
+  round your validator signed. Restoring somebody else's signing state - or an older copy of your
+  own - is the classic way to double-sign and get slashed.
+</Warning>
+
+## Verify (optional)
+
+```bash
+curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4
+curl -fL -o snapshot.tar.lz4.sha256 https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4.sha256
+sha256sum -c snapshot.tar.lz4.sha256
+```
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How often is the snapshot updated?">
+    Every **4 hours**. The last 2 snapshots are kept online.
+  </Accordion>
+  <Accordion title="What db backend?">
+    `goleveldb` for now. A `pebbledb` track is planned and will be published as a separate file.
+  </Accordion>
+  <Accordion title="Can I use this to bootstrap a validator?">
+    Yes. The tarball contains only `data/`. There is no `config/` directory in it, so no
+    `priv_validator_key.json`, no `node_key.json` and no keyring - your identity files are never
+    overwritten by a restore. `data/priv_validator_state.json` is deliberately excluded too.
+  </Accordion>
+  <Accordion title="How is the snapshot kept small?">
+    After each publish, the snapshot node wipes its database and re-syncs a fresh one via
+    state-sync, so an uncompacted database never bloats the next archive.
+  </Accordion>
+  <Accordion title="Is the node stopped while the snapshot is taken?">
+    Yes, briefly. The archive is a cold tar taken with `gaiad` stopped, so the database is never
+    copied mid-write.
+  </Accordion>
+</AccordionGroup>
