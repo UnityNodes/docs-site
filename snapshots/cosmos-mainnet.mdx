@@ -4,13 +4,22 @@ sidebarTitle: 'Cosmos Mainnet'
 ---
 
 Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-day full sync.
+Pick a variant below - the table and the command update together, so you always see exactly
+what you are about to download.
 
 <iframe
   src="https://snapshots.unitynodes.com/cosmos-mainnet/widget.html"
   width="100%"
-  height="160"
+  height="370"
+  allow="clipboard-write"
   style={{ border: 'none', background: 'transparent', display: 'block' }}
 />
+
+<Warning>
+  Do not skip the `priv_validator_state.json` backup step in the command. That file records the
+  last height and round your validator signed. Restoring somebody else's signing state - or an
+  older copy of your own - is the classic way to double-sign and get slashed.
+</Warning>
 
 ## What's inside
 
@@ -21,18 +30,7 @@ Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-
   `wasm/cache` is deliberately left out: it is a compiled, machine-specific cache your node
   rebuilds by itself.
 
-**Download:** [snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4](https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4) - refreshed every 4 hours.
-
 Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapshots.unitynodes.com/cosmos-mainnet/)
-
-<Warning>
-  This is a **pruned** snapshot. It is meant for validators, full nodes and RPC endpoints that
-  only need recent state. It cannot serve historical queries - for that you need an archive node.
-</Warning>
-
-## Restore
-
-Pick the variant you need - each tab has its own copy button.
 
 | Variant | Taken at | Use it when |
 |---|---|---|
@@ -40,6 +38,21 @@ Pick the variant you need - each tab has its own copy button.
 | **Pre-upgrade** | `H-1`, the last block before a scheduled upgrade height | you want to cross the upgrade yourself, on the old binary, exactly as the network does |
 | **Post-upgrade** | shortly after the upgrade height, on the new binary | you are joining after an upgrade and want migrated state with no upgrade handling at all |
 | **Wasm only** | same cadence as Latest | your node is already synced and you only need the CosmWasm contract bytecode |
+
+<Warning>
+  This is a **pruned** snapshot. It is meant for validators, full nodes and RPC endpoints that
+  only need recent state. It cannot serve historical queries - for that you need an archive node.
+</Warning>
+
+<Note>
+  `pre-upgrade` and `post-upgrade` exist only around a scheduled Cosmos Hub upgrade. Their tabs
+  are greyed out until one is published, and each archive ships a `.txt` sidecar naming the
+  upgrade it belongs to.
+</Note>
+
+## All restore commands
+
+The same commands the picker above produces, in case you prefer them inline.
 
 <CodeGroup>
 
@@ -94,18 +107,6 @@ sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
 ```
 
 </CodeGroup>
-
-<Note>
-  `pre-upgrade` and `post-upgrade` exist only around a scheduled Cosmos Hub upgrade. The
-  [archive listing](https://snapshots.unitynodes.com/cosmos-mainnet/) shows which variants are
-  currently published, and each one ships a `.txt` sidecar naming the upgrade it belongs to.
-</Note>
-
-<Warning>
-  Do not skip the `priv_validator_state.json` backup step. That file records the last height and
-  round your validator signed. Restoring somebody else's signing state - or an older copy of your
-  own - is the classic way to double-sign and get slashed.
-</Warning>
 
 ## Verify (optional)
 
