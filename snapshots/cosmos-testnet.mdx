@@ -10,7 +10,7 @@ update together, so you always see exactly what you are about to download.
 <iframe
   src="https://snapshots.unitynodes.com/cosmos-testnet/widget.html"
   width="100%"
-  height="410"
+  height="580"
   allow="clipboard-write"
   style={{ border: 'none', background: 'transparent', display: 'block' }}
 />
@@ -53,7 +53,7 @@ copy of the node's database; the pebbledb snapshot is converted from it and publ
 
 <Note>
   A pebbledb snapshot needs **both** backend settings switched before the node starts - `db_backend`
-  in `config.toml` and `app-db-backend` in `app.toml`. The pebbledb command below does it for you.
+  in `config.toml` and `app-db-backend` in `app.toml`. The pebbledb command in the picker above does it for you.
   Because the restore replaces the whole `data/` folder, this is also how you move an existing
   goleveldb node to pebbledb.
 </Note>
@@ -68,83 +68,6 @@ copy of the node's database; the pebbledb snapshot is converted from it and publ
   are greyed out until one is published, and each archive ships a `.txt` sidecar naming the
   upgrade it belongs to.
 </Note>
-
-## All restore commands
-
-The same commands the picker above produces, in case you prefer them inline.
-
-<CodeGroup>
-
-```bash Latest (goleveldb)
-sudo systemctl stop gaiad
-
-cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
-
-rm -rf $HOME/.gaia/data
-curl -L https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
-
-mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
-
-sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
-```
-
-```bash Latest (pebbledb)
-sudo systemctl stop gaiad
-
-cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
-
-rm -rf $HOME/.gaia/data
-curl -L https://snapshots.unitynodes.com/cosmos-testnet/latest-pebbledb.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
-
-mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
-
-# pebbledb snapshot: switch BOTH backends before starting
-sed -i 's/^db_backend = .*/db_backend = "pebbledb"/' $HOME/.gaia/config/config.toml
-sed -i 's/^app-db-backend = .*/app-db-backend = "pebbledb"/' $HOME/.gaia/config/app.toml
-
-sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
-```
-
-```bash Pre-upgrade (H-1)
-sudo systemctl stop gaiad
-
-cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
-
-rm -rf $HOME/.gaia/data
-# goleveldb: pre-upgrade.tar.lz4   pebbledb: pre-upgrade-pebbledb.tar.lz4 (plus the two sed lines above)
-curl -L https://snapshots.unitynodes.com/cosmos-testnet/pre-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
-
-mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
-
-# start on the OLD binary - the chain will halt at the upgrade height, then swap and restart
-sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
-```
-
-```bash Post-upgrade
-sudo systemctl stop gaiad
-
-cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
-
-rm -rf $HOME/.gaia/data
-# goleveldb: post-upgrade.tar.lz4   pebbledb: post-upgrade-pebbledb.tar.lz4 (plus the two sed lines above)
-curl -L https://snapshots.unitynodes.com/cosmos-testnet/post-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
-
-mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
-
-# start on the NEW binary for that upgrade
-sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
-```
-
-```bash Wasm only
-# contract bytecode only - for a node that is already synced (either backend)
-sudo systemctl stop gaiad
-
-curl -L https://snapshots.unitynodes.com/cosmos-testnet/wasm.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
-
-sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
-```
-
-</CodeGroup>
 
 ## Verify (optional)
 
