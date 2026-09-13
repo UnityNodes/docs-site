@@ -3,17 +3,13 @@ title: 'Cosmos Hub Testnet snapshot'
 sidebarTitle: 'Cosmos Testnet'
 ---
 
+import { SnapshotPicker } from "/snippets/snapshot-picker.jsx";
+
 Bootstrap a Cosmos Hub testnet (`provider`) node in minutes instead of a multi-day full sync, in
 **goleveldb** or **pebbledb**. Pick the database and the variant below - the table and the command
 update together, so you always see exactly what you are about to download.
 
-<iframe
-  src="https://snapshots.unitynodes.com/cosmos-testnet/widget.html"
-  width="100%"
-  height="580"
-  allow="clipboard-write"
-  style={{ border: 'none', background: 'transparent', display: 'block' }}
-/>
+<SnapshotPicker network="cosmos-testnet" />
 
 <Note>
   The testnet upgrades far more often than mainnet, usually to release candidates (for example

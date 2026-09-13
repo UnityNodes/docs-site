@@ -3,17 +3,13 @@ title: 'Cosmos Hub Mainnet snapshot'
 sidebarTitle: 'Cosmos Mainnet'
 ---
 
+import { SnapshotPicker } from "/snippets/snapshot-picker.jsx";
+
 Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-day full sync, in
 **goleveldb** or **pebbledb**. Pick the database and the variant below - the table and the command
 update together, so you always see exactly what you are about to download.
 
-<iframe
-  src="https://snapshots.unitynodes.com/cosmos-mainnet/widget.html"
-  width="100%"
-  height="580"
-  allow="clipboard-write"
-  style={{ border: 'none', background: 'transparent', display: 'block' }}
-/>
+<SnapshotPicker network="cosmos-mainnet" />
 
 <Warning>
   Do not skip the `priv_validator_state.json` backup step in the command. That file records the
