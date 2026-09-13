@@ -1,19 +1,25 @@
 ---
-title: 'Cosmos Hub Mainnet snapshot'
-sidebarTitle: 'Cosmos Mainnet'
+title: 'Cosmos Hub Testnet snapshot'
+sidebarTitle: 'Cosmos Testnet'
 ---
 
-Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-day full sync, in
+Bootstrap a Cosmos Hub testnet (`provider`) node in minutes instead of a multi-day full sync, in
 **goleveldb** or **pebbledb**. Pick the database and the variant below - the table and the command
 update together, so you always see exactly what you are about to download.
 
 <iframe
-  src="https://snapshots.unitynodes.com/cosmos-mainnet/widget.html"
+  src="https://snapshots.unitynodes.com/cosmos-testnet/widget.html"
   width="100%"
   height="410"
   allow="clipboard-write"
   style={{ border: 'none', background: 'transparent', display: 'block' }}
 />
+
+<Note>
+  The testnet upgrades far more often than mainnet, usually to release candidates (for example
+  `v28.0.0-rc0`). Always start the node on the `gaiad` version the network is running now - check
+  [cosmos/testnets](https://github.com/cosmos/testnets/tree/master/provider) - not the mainnet release.
+</Note>
 
 <Warning>
   Do not skip the `priv_validator_state.json` backup step in the command. That file records the
@@ -23,14 +29,14 @@ update together, so you always see exactly what you are about to download.
 
 ## What's inside
 
-- `data/` folder from a live Cosmos Hub (`cosmoshub-4`) `gaiad` full node with pruning (`custom` / `keep-recent=100` / `interval=19`).
+- `data/` folder from a live Cosmos Hub testnet (`provider`) `gaiad` full node with pruning (`custom` / `keep-recent=100` / `interval=19`).
 - `wasm/state` - the CosmWasm **contract bytecode**. `x/wasm` keeps only the code hashes in
   `application.db` and the bytecode itself on disk, so a `data/`-only archive restores a node
   that cannot execute contracts. It is bundled here so the snapshot is self-sufficient.
   `wasm/cache` is deliberately left out: it is a compiled, machine-specific cache your node
   rebuilds by itself.
 
-Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapshots.unitynodes.com/cosmos-mainnet/)
+Full archive listing: [snapshots.unitynodes.com/cosmos-testnet/](https://snapshots.unitynodes.com/cosmos-testnet/)
 
 | Variant | Taken at | Use it when |
 |---|---|---|
@@ -58,7 +64,7 @@ copy of the node's database; the pebbledb snapshot is converted from it and publ
 </Warning>
 
 <Note>
-  `pre-upgrade` and `post-upgrade` exist only around a scheduled Cosmos Hub upgrade. Their tabs
+  `pre-upgrade` and `post-upgrade` exist only around a scheduled testnet upgrade. Their tabs
   are greyed out until one is published, and each archive ships a `.txt` sidecar naming the
   upgrade it belongs to.
 </Note>
@@ -75,7 +81,7 @@ sudo systemctl stop gaiad
 cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
 
 rm -rf $HOME/.gaia/data
-curl -L https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+curl -L https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
 
 mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
 
@@ -88,7 +94,7 @@ sudo systemctl stop gaiad
 cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.json.backup
 
 rm -rf $HOME/.gaia/data
-curl -L https://snapshots.unitynodes.com/cosmos-mainnet/latest-pebbledb.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+curl -L https://snapshots.unitynodes.com/cosmos-testnet/latest-pebbledb.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
 
 mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
 
@@ -106,7 +112,7 @@ cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.j
 
 rm -rf $HOME/.gaia/data
 # goleveldb: pre-upgrade.tar.lz4   pebbledb: pre-upgrade-pebbledb.tar.lz4 (plus the two sed lines above)
-curl -L https://snapshots.unitynodes.com/cosmos-mainnet/pre-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+curl -L https://snapshots.unitynodes.com/cosmos-testnet/pre-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
 
 mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
 
@@ -121,7 +127,7 @@ cp $HOME/.gaia/data/priv_validator_state.json $HOME/.gaia/priv_validator_state.j
 
 rm -rf $HOME/.gaia/data
 # goleveldb: post-upgrade.tar.lz4   pebbledb: post-upgrade-pebbledb.tar.lz4 (plus the two sed lines above)
-curl -L https://snapshots.unitynodes.com/cosmos-mainnet/post-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+curl -L https://snapshots.unitynodes.com/cosmos-testnet/post-upgrade.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
 
 mv $HOME/.gaia/priv_validator_state.json.backup $HOME/.gaia/data/priv_validator_state.json
 
@@ -133,7 +139,7 @@ sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
 # contract bytecode only - for a node that is already synced (either backend)
 sudo systemctl stop gaiad
 
-curl -L https://snapshots.unitynodes.com/cosmos-mainnet/wasm.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
+curl -L https://snapshots.unitynodes.com/cosmos-testnet/wasm.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.gaia
 
 sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
 ```
@@ -143,8 +149,8 @@ sudo systemctl restart gaiad && sudo journalctl -u gaiad -fo cat
 ## Verify (optional)
 
 ```bash
-curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4
-curl -fL -o snapshot.tar.lz4.sha256 https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4.sha256
+curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4
+curl -fL -o snapshot.tar.lz4.sha256 https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4.sha256
 sha256sum -c snapshot.tar.lz4.sha256
 ```
 

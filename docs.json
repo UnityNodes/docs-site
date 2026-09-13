@@ -40,7 +40,8 @@
           {
             "group": "Cosmos",
             "pages": [
-              "snapshots/cosmos-mainnet"
+              "snapshots/cosmos-mainnet",
+              "snapshots/cosmos-testnet"
             ]
           }
         ]
