@@ -11,12 +11,6 @@ update together, so you always see exactly what you are about to download.
 
 <SnapshotPicker network="cosmos-testnet" />
 
-<Note>
-  The testnet upgrades far more often than mainnet, usually to release candidates (for example
-  `v28.0.0-rc0`). Always start the node on the `gaiad` version the network is running now - check
-  [cosmos/testnets](https://github.com/cosmos/testnets/tree/master/provider) - not the mainnet release.
-</Note>
-
 <Warning>
   Do not skip the `priv_validator_state.json` backup step in the command. That file records the
   last height and round your validator signed. Restoring somebody else's signing state - or an
