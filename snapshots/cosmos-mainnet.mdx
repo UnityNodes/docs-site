@@ -17,6 +17,13 @@ update together, so you always see exactly what you are about to download.
   older copy of your own - is the classic way to double-sign and get slashed.
 </Warning>
 
+<Note>
+  A pebbledb snapshot needs **both** backend settings switched before the node starts - `db_backend`
+  in `config.toml` and `app-db-backend` in `app.toml`. The pebbledb command in the picker above does it for you.
+  Because the restore replaces the whole `data/` folder, this is also how you move an existing
+  goleveldb node to pebbledb.
+</Note>
+
 ## What's inside
 
 - `data/` folder from a live Cosmos Hub (`cosmoshub-4`) `gaiad` full node with pruning (`custom` / `keep-recent=100` / `interval=19`).
@@ -34,30 +41,6 @@ Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapsho
 | **Pre-upgrade** | `H-1`, the last block before a scheduled upgrade height | you want to cross the upgrade yourself, on the old binary, exactly as the network does |
 | **Post-upgrade** | shortly after the upgrade height, on the new binary | you are joining after an upgrade and want migrated state with no upgrade handling at all |
 | **Wasm only** | same cadence as Latest | your node is already synced and you only need the CosmWasm contract bytecode |
-
-## goleveldb or pebbledb
-
-Every variant is published in both backends at the **same height**. The goleveldb snapshot is a cold
-copy of the node's database; the pebbledb snapshot is converted from it and published only after
-**every key and value** has been checked to match the goleveldb original.
-
-<Note>
-  A pebbledb snapshot needs **both** backend settings switched before the node starts - `db_backend`
-  in `config.toml` and `app-db-backend` in `app.toml`. The pebbledb command in the picker above does it for you.
-  Because the restore replaces the whole `data/` folder, this is also how you move an existing
-  goleveldb node to pebbledb.
-</Note>
-
-<Warning>
-  These are **pruned** snapshots. They are meant for validators, full nodes and RPC endpoints that
-  only need recent state. They cannot serve historical queries - for that you need an archive node.
-</Warning>
-
-<Note>
-  `pre-upgrade` and `post-upgrade` exist only around a scheduled Cosmos Hub upgrade. Their tabs
-  are greyed out until one is published, and each archive ships a `.txt` sidecar naming the
-  upgrade it belongs to.
-</Note>
 
 ## Verify (optional)
 
