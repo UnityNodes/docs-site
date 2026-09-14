@@ -42,8 +42,8 @@ Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapsho
 | Variant | Taken at | Use it when |
 |---|---|---|
 | **Latest** | every 4 hours | normal bootstrap of a node |
-| **Pre-upgrade** | `H-1`, the last block before a scheduled upgrade height | you want to cross the upgrade yourself, on the old binary, exactly as the network does |
-| **Post-upgrade** | shortly after the upgrade height, on the new binary | you are joining after an upgrade and want migrated state with no upgrade handling at all |
+| **Pre-upgrade** | `H-1`, taken at the upgrade halt | you want to apply the upgrade yourself. Start it on the NEW binary for that upgrade: it applies the upgrade at the halt height |
+| **Post-upgrade** | shortly after the upgrade height | you are joining after an upgrade and want migrated state with no upgrade handling at all. Start it on the NEW binary for that upgrade |
 | **Wasm only** | same cadence as Latest | your node is already synced and you only need the CosmWasm contract bytecode |
 
 ## Verify (optional)
