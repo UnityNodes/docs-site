@@ -15,6 +15,10 @@ update together, so you always see exactly what you are about to download.
   Do not skip the `priv_validator_state.json` backup step in the command. That file records the
   last height and round your validator signed. Restoring somebody else's signing state - or an
   older copy of your own - is the classic way to double-sign and get slashed.
+
+  The command stops at the first step that fails, so a failed or cut download never restarts `gaiad`
+  on a partial `data/`. Your signing state then stays in `~/.gaia/priv_validator_state.json.backup`:
+  fix the cause and run the command again starting from the `rm -rf` line.
 </Warning>
 
 <Note>
@@ -45,12 +49,18 @@ Full archive listing: [snapshots.unitynodes.com/cosmos-testnet/](https://snapsho
 ## Verify (optional)
 
 ```bash
-curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4
-curl -fL -o snapshot.tar.lz4.sha256 https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4.sha256
-sha256sum -c snapshot.tar.lz4.sha256
+curl -fsSL -o snapshot.sha256 https://snapshots.unitynodes.com/cosmos-testnet/latest.tar.lz4.sha256 && \
+F=$(awk '{print $2}' snapshot.sha256) && \
+curl -fL -o "$F" "https://snapshots.unitynodes.com/cosmos-testnet/$F" && \
+sha256sum -c snapshot.sha256
 ```
 
-For pebbledb use `latest-pebbledb.tar.lz4` and `latest-pebbledb.tar.lz4.sha256`.
+The `.sha256` file is fetched first: it names the dated archive it belongs to, so the file you download is
+always the one the checksum is for, even if a new snapshot is published during a long download. The last line should read `<archive name>: OK`.
+For pebbledb fetch `latest-pebbledb.tar.lz4.sha256` instead.
+
+To restore from the verified file rather than streaming it, use `lz4 -dc "$F"` in place of
+`curl -fL <url> | lz4 -dc -` in the picker command.
 
 ## FAQ
 

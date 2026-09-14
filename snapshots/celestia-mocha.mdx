@@ -26,25 +26,31 @@ Also available: [`genesis.json`](https://snapshots.unitynodes.com/celestia-mocha
 ## Restore
 
 ```bash
-sudo systemctl stop celestia-appd
-
-cp $HOME/.celestia-app/data/priv_validator_state.json $HOME/.celestia-app/priv_validator_state.json.backup
-
-rm -rf $HOME/.celestia-app/data
-curl -L https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app
-
-mv $HOME/.celestia-app/priv_validator_state.json.backup $HOME/.celestia-app/data/priv_validator_state.json
-
-sudo systemctl restart celestia-appd && sudo journalctl -u celestia-appd -fo cat
+sudo systemctl stop celestia-appd && \
+cp $HOME/.celestia-app/data/priv_validator_state.json $HOME/.celestia-app/priv_validator_state.json.backup && \
+rm -rf $HOME/.celestia-app/data && \
+(set -o pipefail; curl -fL https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app) && \
+mv $HOME/.celestia-app/priv_validator_state.json.backup $HOME/.celestia-app/data/priv_validator_state.json && \
+sudo systemctl restart celestia-appd && \
+sudo journalctl -u celestia-appd -fo cat
 ```
+
+Each step runs only if the previous one succeeded, so a failed or cut download never restarts
+`celestia-appd` on a partial `data/`. Your signing state then stays in
+`~/.celestia-app/priv_validator_state.json.backup`: fix the cause and run the command again starting
+from the `rm -rf` line.
 
 ## Verify (optional)
 
 ```bash
-curl -fL -o snapshot.tar.lz4 https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4
-curl -fL -o snapshot.tar.lz4.sha256 https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4.sha256
-sha256sum -c snapshot.tar.lz4.sha256
+curl -fsSL -o snapshot.sha256 https://snapshots.unitynodes.com/celestia-mocha/latest.tar.lz4.sha256 && \
+F=$(awk '{print $2}' snapshot.sha256) && \
+curl -fL -o "$F" "https://snapshots.unitynodes.com/celestia-mocha/$F" && \
+sha256sum -c snapshot.sha256
 ```
+
+The `.sha256` file is fetched first: it names the dated archive it belongs to, so the file you download is
+always the one the checksum is for, even if a new snapshot is published during a long download. The last line should read `<archive name>: OK`.
 
 ## FAQ
 

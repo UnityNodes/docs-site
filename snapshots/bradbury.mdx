@@ -80,15 +80,19 @@ Full archive listing (all retained snapshots): [snapshots.unitynodes.com/bradbur
 </Accordion>
 
 <Accordion title="How do I verify the file's integrity (SHA256)?">
-  Every archive is published with a matching `.sha256` file. Download both and check:
+  Every archive is published with a matching `.sha256` file. Fetch it first - it names the dated archive it
+  belongs to - then download that exact file and check it:
 
   ```bash
-  curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz
-  curl -fLO https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256
-  sha256sum -c latest.tar.gz.sha256
+  curl -fsSL -o snapshot.sha256 https://snapshots.unitynodes.com/bradbury/latest.tar.gz.sha256 && \
+  F=$(awk '{print $2}' snapshot.sha256) && \
+  curl -fL -o "$F" "https://snapshots.unitynodes.com/bradbury/$F" && \
+  sha256sum -c snapshot.sha256
   ```
 
-  Expected output: `latest.tar.gz: OK`. If it prints anything else, delete the file and download again.
+  Expected last line: `bradbury-snapshot-<date>-<time>.tar.gz: OK`. Because the file name comes from the
+  `.sha256`, a new snapshot published during the download cannot mix up the two files. If it prints anything
+  else, delete the file and download again.
 </Accordion>
 
 <Accordion title="How often are snapshots refreshed?">
