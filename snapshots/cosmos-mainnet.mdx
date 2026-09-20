@@ -5,6 +5,8 @@ sidebarTitle: 'Cosmos Mainnet'
 
 import { SnapshotPicker } from "/snippets/snapshot-picker.jsx";
 
+**Cosmos Hub Snapshots, provided by Unity Nodes.**
+
 Bootstrap a Cosmos Hub `cosmoshub-4` mainnet node in minutes instead of a multi-day full sync, in
 **goleveldb** or **pebbledb**. Pick the database and the variant below - the table and the command
 update together, so you always see exactly what you are about to download.
@@ -46,7 +48,31 @@ Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapsho
 | **Post-upgrade** | shortly after the upgrade height | you are joining after an upgrade and want migrated state with no upgrade handling at all. Start it on the NEW binary for that upgrade |
 | **Wasm only** | same cadence as Latest | your node is already synced and you only need the CosmWasm contract bytecode |
 
-## Verify (optional)
+## Compatible software and settings
+
+| What | Setting |
+|---|---|
+| **Binary** | `gaiad` at the version the snapshot was taken on. Every archive has a `.txt` sidecar with `node_version` (currently `v28.1.0`); a node started on an older binary than the state was written with will not start |
+| **Pre/post-upgrade archives** | start them on the **new** binary for that upgrade. The `.txt` sidecar names it in `restore_binary` |
+| **goleveldb archive** | default settings, nothing to change |
+| **pebbledb archive** | set `db_backend = "pebbledb"` in `config.toml` **and** `app-db-backend = "pebbledb"` in `app.toml` before the first start |
+| **Pruning in the archive** | `custom`, `keep-recent=100`, `interval=19` |
+
+## File names
+
+Each archive is published under a name carrying the chain ID, database backend, block height and
+UTC creation time, with a matching `.sha256` and `.txt` next to it:
+
+```
+cosmoshub-4_pebbledb_33052362_20260920T051157Z.tar.lz4
+cosmoshub-4_goleveldb_33052362_20260920T044334Z.tar.lz4
+```
+
+`latest.tar.lz4` and `latest-pebbledb.tar.lz4` always point at the newest of each, so scripts can
+use a stable URL. Downloads support HTTP range requests, so `aria2c -x8` and resumed `curl -C -`
+both work.
+
+## Verify the download
 
 ```bash
 curl -fsSL -o snapshot.sha256 https://snapshots.unitynodes.com/cosmos-mainnet/latest.tar.lz4.sha256 && \
@@ -66,8 +92,8 @@ To restore from the verified file rather than streaming it, use `lz4 -dc "$F"` i
 
 <AccordionGroup>
   <Accordion title="How often is the snapshot updated?">
-    goleveldb every **4 hours**; the pebbledb snapshot for the same height follows within about
-    an hour. The last 2 of each are kept online.
+    goleveldb every **4 hours**; the pebbledb snapshot for the same height follows about
+    **30 minutes** later. The last 2 of each are kept online.
   </Accordion>
   <Accordion title="What db backend?">
     Both. `goleveldb` and `pebbledb`, always at the same height.
@@ -101,3 +127,12 @@ To restore from the verified file rather than streaming it, use `lz4 -dc "$F"` i
     to independent public RPCs.
   </Accordion>
 </AccordionGroup>
+
+## Status and support
+
+The service is monitored around the clock: snapshot freshness, archive size, the pebbledb conversion
+and public reachability of every download URL all raise alerts on two independent monitoring hosts.
+
+If a snapshot looks stale, a download fails or a checksum does not match, write to
+[contact@unitynodes.com](mailto:contact@unitynodes.com). Include the file name you were fetching
+and the error. We answer with what happened and when it will be fixed.
