@@ -52,7 +52,7 @@ Full archive listing: [snapshots.unitynodes.com/cosmos-mainnet/](https://snapsho
 
 | What | Setting |
 |---|---|
-| **Binary** | the `gaiad` version the snapshot was taken on, or newer. Every archive carries a `.txt` sidecar with the exact `node_version` it was produced by (currently `v28.1.0`). An older binary can refuse to start if the state has already been migrated by an upgrade the binary does not know about |
+| **Binary** | the `gaiad` version the snapshot was taken on, or newer. Every archive carries a `.txt` sidecar with the exact `node_version` it was produced by (currently `v28.2.0`). An older binary can refuse to start if the state has already been migrated by an upgrade the binary does not know about |
 | **Pre/post-upgrade archives** | start them on the **new** binary for that upgrade. The `.txt` sidecar names it in `restore_binary` |
 | **goleveldb archive** | default settings, nothing to change |
 | **pebbledb archive** | set `db_backend = "pebbledb"` in `config.toml` **and** `app-db-backend = "pebbledb"` in `app.toml` before the first start |
